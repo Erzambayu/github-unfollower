@@ -1,0 +1,32 @@
+@font-face {
+  font-family: fira-code;
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/public/fonts/fira-code/fira-code.woff2") format("woff2");
+}
+
+@import "tailwindcss";
+
+@theme {
+  --font-fira-code: "fira-code";
+
+  --color-background: #12161E; 
+  --color-background-box: #181B25; 
+
+  --color-text-title: #fff;
+  --color-text-primary: hsla(0, 0%, 100%, 0.87);
+  --color-text-secondary: hsla(0, 0%, 100%, 0.56);
+
+  --color-error: #e05661;
+  --color-success: #238C61; 
+  --color-warning: #facc15;
+
+  --color-btn: #4f46e5;
+  --color-btn-hover: #4338ca;
+
+  --color-border-input: hsla(0, 0%, 100%, 0.24);
+  --color-border-menu: hsla(0, 0%, 100%, 0.12);
+  --color-border-box: hsla(0, 0%, 100%, 0.08);
+  --color-border-hr: #2c2c30;
+}
