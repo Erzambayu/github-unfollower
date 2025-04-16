@@ -26,6 +26,8 @@
     --radius-sm: 0.25rem;
     --radius-md: 0.375rem;
     --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    --default-transition-duration: 150ms;
+    --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     --default-font-family: var(--font-sans);
     --default-mono-font-family: var(--font-mono);
     --font-fira-code: "fira-code";
@@ -35,6 +37,7 @@
     --color-text-primary: hsla(0, 0%, 100%, 0.87);
     --color-text-secondary: hsla(0, 0%, 100%, 0.56);
     --color-btn: #4f46e5;
+    --color-btn-hover: #4338ca;
     --color-border-input: hsla(0, 0%, 100%, 0.24);
     --color-border-box: hsla(0, 0%, 100%, 0.08);
   }
@@ -336,9 +339,25 @@
   .text-text-title {
     color: var(--color-text-title);
   }
+  .transition-colors {
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .duration-150 {
+    --tw-duration: 150ms;
+    transition-duration: 150ms;
+  }
   .outline-none {
     --tw-outline-style: none;
     outline-style: none;
+  }
+  .hover\:bg-btn-hover {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-btn-hover);
+      }
+    }
   }
   .sm\:grid-cols-2 {
     @media (width >= 40rem) {
@@ -378,6 +397,10 @@
   inherits: false;
   initial-value: solid;
 }
+@property --tw-duration {
+  syntax: "*";
+  inherits: false;
+}
 @keyframes pulse {
   50% {
     opacity: 0.5;
@@ -387,6 +410,7 @@
   @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
     *, ::before, ::after, ::backdrop {
       --tw-border-style: solid;
+      --tw-duration: initial;
     }
   }
 }
