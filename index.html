@@ -202,6 +202,35 @@
         <!-- toast load in js -->
     </div>
 
+    <!-- popup-token -->
+    <div class="fixed inset-0 bg-overlay backdrop-blur-xs items-center justify-center z-10 hidden">
+        <div class="bg-background-box border border-border-box rounded-xl p-6 max-w-md text-text-primary text-sm animate-animate-fade-in">
+            <h2 class="text-xl font-semibold text-text-title">Enter GitHub Token</h2>
+            <div class="text-text-secondary mt-4 leading-relaxed">
+                <span>⚠️If you have over <b>6,000</b> total followers/following, a GitHub token is required.</span>
+                <div class="py-5">
+                    <p>🔑 <b>How to generate a GitHub token:</b></p>
+                    <ol class="list-decimal list-inside">
+                        <li>Go to <a href="https://github.com/settings/tokens" target="_blank" class="text-btn">https://github.com/settings/tokens</a></li>
+                        <li>Click <b>"Generate new token (classic)"</b></li>
+                        <li>Set an <b>expiration date</b> (e.g., 7 days)</li>
+                        <li>Scroll down to the <b>"Select scopes"</b> section</li>
+                        <li><b>Tick the checkbox for <code class="text-warning">user</code> scope</b></li>
+                        <li>Click "Generate token" and copy it</li>
+                        <li>Paste it into the input field below</li>
+                    </ol>
+                </div>
+                <span>🔐 <b>Note:</b> Your token is only stored <u>locally</u> in your browser and never sent anywhere.</span>
+            </div>
+            <input type="text" placeholder="Paste your GitHub token here..." class="w-full px-3 py-2 mt-7 rounded-md bg-background border border-border-input outline-none"/>
+            <p class="text-error text-sm py-2 hidden">error text</p>
+            <div class="flex justify-end items-center mt-5 space-x-2">
+                <button class="px-4 py-2 rounded-md cursor-pointer bg-btn-secondary hover:bg-btn-secondary-hover text-text-title">Cancel</button>
+                <button class="px-4 py-2 rounded-md cursor-pointer bg-btn-primary hover:bg-btn-primary-hover text-text-title">Submit</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>
