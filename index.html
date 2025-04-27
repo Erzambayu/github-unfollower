@@ -186,7 +186,7 @@
     </main>
 
     <footer class="flex items-center justify-between mx-2.5 py-4 text-text-primary border-t border-border-box">
-        <button title="Over 6,000 total followers/following? GitHub token needed!" class="cursor-pointer">Enter Your Token</button>
+        <button id="open-popup-token" title="Over 6,000 total followers/following? GitHub token needed!" class="cursor-pointer">Enter Your Token</button>
         <a href="https://github.com/Nimakian0/github-unfollower">View on GitHub</a>
     </footer>
 
@@ -203,8 +203,9 @@
     </div>
 
     <!-- popup-token -->
-    <div class="fixed inset-0 bg-overlay backdrop-blur-xs items-center justify-center z-10 hidden">
-        <div class="bg-background-box border border-border-box rounded-xl p-6 max-w-md text-text-primary text-sm animate-animate-fade-in">
+    <div id="popup-token" class="fixed inset-0 items-center justify-center z-10 hidden">
+        <div id="popup-token-overlay" class="absolute inset-0 bg-overlay backdrop-blur-xs cursor-pointer z-0"></div> <!-- overlay -->
+        <div id="popup-token-content" class="bg-background-box border border-border-box rounded-xl p-6 max-w-md text-text-primary text-sm z-10">
             <h2 class="text-xl font-semibold text-text-title">Enter GitHub Token</h2>
             <div class="text-text-secondary mt-4 leading-relaxed">
                 <span>⚠️If you have over <b>6,000</b> total followers/following, a GitHub token is required.</span>
@@ -225,11 +226,13 @@
             <input type="text" placeholder="Paste your GitHub token here..." class="w-full px-3 py-2 mt-7 rounded-md bg-background border border-border-input outline-none"/>
             <p class="text-error text-sm py-2 hidden">error text</p>
             <div class="flex justify-end items-center mt-5 space-x-2">
-                <button class="px-4 py-2 rounded-md cursor-pointer bg-btn-secondary hover:bg-btn-secondary-hover text-text-title">Cancel</button>
+                <button id="hide-popup-token" class="px-4 py-2 rounded-md cursor-pointer bg-btn-secondary hover:bg-btn-secondary-hover text-text-title">Cancel</button>
                 <button class="px-4 py-2 rounded-md cursor-pointer bg-btn-primary hover:bg-btn-primary-hover text-text-title">Submit</button>
             </div>
         </div>
     </div>
+
+    <script src="src/scripts/app.js" type="module"></script>
 
 </body>
 
