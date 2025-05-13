@@ -92,6 +92,12 @@ const getUsersINotFollowingBack = ({ followers, following }) => {
     return usersINotFollowingBack
 }
 
+const changeBtnStatus = ({ btn, status, text }) => {
+    btn.disabled = !status;
+    btn.textContent = text;
+    btn.classList.toggle("cursor-not-allowed", !status);
+    btn.classList.toggle("cursor-pointer", status);
+}
 
 export {
     showPopup,
@@ -101,4 +107,5 @@ export {
     addToLocal,
     getUsersNotFollowingMe,
     getUsersINotFollowingBack,
+    changeBtnStatus,
 }

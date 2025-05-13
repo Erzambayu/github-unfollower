@@ -502,9 +502,6 @@
   .whitespace-nowrap {
     white-space: nowrap;
   }
-  .text-error {
-    color: var(--color-error);
-  }
   .text-text-primary {
     color: var(--color-text-primary);
   }
