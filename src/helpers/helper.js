@@ -63,7 +63,12 @@ const showToast = ({ container, message, type, duration = 6000 }) => {
 }
 
 const getFromLocal = (key) => {
-    return JSON.parse(localStorage.getItem(key))
+    const localStorageItem = localStorage.getItem(key)
+    if (localStorageItem) {
+        return JSON.parse(localStorageItem)
+    } else {
+        return null
+    }
 }
 const addToLocal = (key, value) => {
     localStorage.setItem(key, JSON.stringify(value))
