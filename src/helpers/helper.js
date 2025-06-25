@@ -110,6 +110,11 @@ const changeBtnStatus = ({ btn, status, text }) => {
     btn.classList.toggle("cursor-not-allowed", !status);
     btn.classList.toggle("cursor-pointer", status);
 }
+const changeInputStatus = ({ input, status }) => {
+    input.disabled = !status;
+    input.classList.toggle("cursor-not-allowed", !status);
+    input.classList.toggle("cursor-text", status);
+}
 
 export {
     showPopup,
@@ -120,4 +125,5 @@ export {
     getUsersNotFollowingMe,
     getUsersINotFollowingBack,
     changeBtnStatus,
+    changeInputStatus
 }

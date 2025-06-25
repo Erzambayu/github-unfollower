@@ -7,6 +7,7 @@ import {
     changeBtnStatus,
     getUsersNotFollowingMe,
     getUsersINotFollowingBack,
+    changeInputStatus,
 } from "../helpers/helper.js";
 import {
     getFollowers,
@@ -17,6 +18,24 @@ import {
 
 
 window.addEventListener("load", () => {
+    // Show loading skeletons for notFollowedBack and notFollowingBack containers
+    const notFollowingBackContainer = document.getElementById("not-followingBack-container")
+    const notFollowedBackContainer = document.getElementById("not-followedBack-container")
+    for (let i = 1; i <= 9; i++) {
+        notFollowingBackContainer.insertAdjacentHTML("beforeend", `
+            <div class="w-full p-2 bg-background-box border border-border-box rounded-md flex items-center animate-pulse">
+                <div class="w-9 h-9 rounded-full bg-border-box"></div>
+                <div class="w-1/3 h-3 ml-3 bg-border-box rounded-sm"></div>
+            </div>
+        `)
+        notFollowedBackContainer.insertAdjacentHTML("beforeend", `
+            <div class="w-full p-2 bg-background-box border border-border-box rounded-md flex items-center animate-pulse">
+                <div class="w-9 h-9 rounded-full bg-border-box"></div>
+                <div class="w-1/3 h-3 ml-3 bg-border-box rounded-sm"></div>
+            </div>
+        `)
+    }
+
     const loaderElem = document.getElementById("loader")
     setTimeout(() => {
         loaderElem.classList.remove("flex")
@@ -177,6 +196,10 @@ window.addEventListener("load", () => {
                 status: false,
                 text: "Please wait",
             });
+            changeInputStatus({ 
+                input: searchUserInput,
+                status: false 
+            });
 
             const token = getFromLocal("token")
             const getRateLimitRes = await getRateLimit()
@@ -235,6 +258,10 @@ window.addEventListener("load", () => {
                 btn: searchUserBtn,
                 status: true,
                 text: originalText,
+            });
+            changeInputStatus({ 
+                input: searchUserInput,
+                status: true 
             });
         } else {
             showToast({ container: toastContainer, message: "Please enter a GitHub username to search.", type: "warning", duration: 5000 })
