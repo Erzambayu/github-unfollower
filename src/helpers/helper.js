@@ -116,6 +116,18 @@ const changeInputStatus = ({ input, status }) => {
     input.classList.toggle("cursor-text", status);
 }
 
+const showSkeletonLoaders = ({ container }) => {
+    container.innerHTML = ""
+    for (let i = 1; i <= 9; i++) {
+        container.insertAdjacentHTML("beforeend", `
+            <div class="w-full p-2 bg-background-box border border-border-box rounded-md flex items-center animate-pulse">
+                <div class="w-9 h-9 rounded-full bg-border-box"></div>
+                <div class="w-1/3 h-3 ml-3 bg-border-box rounded-sm"></div>
+            </div>
+        `);
+    }
+}
+
 export {
     showPopup,
     hidePopup,
@@ -125,5 +137,6 @@ export {
     getUsersNotFollowingMe,
     getUsersINotFollowingBack,
     changeBtnStatus,
-    changeInputStatus
+    changeInputStatus,
+    showSkeletonLoaders,
 }
