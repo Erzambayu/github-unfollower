@@ -251,6 +251,9 @@
   .mx-auto {
     margin-inline: auto;
   }
+  .mt-2 {
+    margin-top: calc(var(--spacing) * 2);
+  }
   .mt-3 {
     margin-top: calc(var(--spacing) * 3);
   }
@@ -277,6 +280,10 @@
   }
   .hidden {
     display: none;
+  }
+  .size-10 {
+    width: calc(var(--spacing) * 10);
+    height: calc(var(--spacing) * 10);
   }
   .h-3 {
     height: calc(var(--spacing) * 3);
@@ -472,6 +479,9 @@
   }
   .py-5 {
     padding-block: calc(var(--spacing) * 5);
+  }
+  .py-25 {
+    padding-block: calc(var(--spacing) * 25);
   }
   .text-center {
     text-align: center;

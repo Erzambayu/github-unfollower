@@ -8,6 +8,7 @@ import {
     getUsersNotFollowingMe,
     getUsersINotFollowingBack,
     changeInputStatus,
+    showSkeletonLoaders,
 } from "../helpers/helper.js";
 import {
     getFollowers,
@@ -21,20 +22,8 @@ window.addEventListener("load", () => {
     // Show loading skeletons for notFollowedBack and notFollowingBack containers
     const notFollowingBackContainer = document.getElementById("not-followingBack-container")
     const notFollowedBackContainer = document.getElementById("not-followedBack-container")
-    for (let i = 1; i <= 9; i++) {
-        notFollowingBackContainer.insertAdjacentHTML("beforeend", `
-            <div class="w-full p-2 bg-background-box border border-border-box rounded-md flex items-center animate-pulse">
-                <div class="w-9 h-9 rounded-full bg-border-box"></div>
-                <div class="w-1/3 h-3 ml-3 bg-border-box rounded-sm"></div>
-            </div>
-        `)
-        notFollowedBackContainer.insertAdjacentHTML("beforeend", `
-            <div class="w-full p-2 bg-background-box border border-border-box rounded-md flex items-center animate-pulse">
-                <div class="w-9 h-9 rounded-full bg-border-box"></div>
-                <div class="w-1/3 h-3 ml-3 bg-border-box rounded-sm"></div>
-            </div>
-        `)
-    }
+    showSkeletonLoaders({ container: notFollowingBackContainer })
+    showSkeletonLoaders({ container: notFollowedBackContainer })
 
     const loaderElem = document.getElementById("loader")
     setTimeout(() => {
@@ -53,6 +42,8 @@ window.addEventListener("load", () => {
     const toastContainer = document.getElementById("toast-container")
     const searchUserInput = document.getElementById("search-user-input")
     const searchUserBtn = document.getElementById("search-user-btn")
+    const notFollowingBackPagination = document.getElementById("not-followingBack-pagination")
+    const notFollowedBackPagination = document.getElementById("not-followedBack-pagination")
 
 
 
@@ -104,6 +95,73 @@ window.addEventListener("load", () => {
         }
     });
 
+    // sets up event listeners for "Next" and "Previous" pagination buttons.
+    const setupPaginationControls = ({ usersArray, container, currentPage, itemsPerPage, paginationContainerSelector }) => {
+        renderUsersPage({ usersArray, container, currentPage, itemsPerPage, paginationContainerSelector })
+
+        paginationContainerSelector.querySelector(".next-btn").onclick = () => {
+            renderUsersPage({ usersArray, container, currentPage: ++currentPage, itemsPerPage, paginationContainerSelector })
+        }
+        paginationContainerSelector.querySelector(".prev-btn").onclick = () => {
+            renderUsersPage({ usersArray, container, currentPage: --currentPage, itemsPerPage, paginationContainerSelector })
+        }
+    }
+
+    // Renders a specific page of users from a given array into the provided container.
+    // Updates pagination UI (current page, total pages, and button states).
+    const renderUsersPage = ({ usersArray, container, currentPage, itemsPerPage, paginationContainerSelector }) => {
+        const totalPages = Math.ceil(usersArray.length / itemsPerPage);
+        paginationContainerSelector.querySelector(".current-page").innerHTML = currentPage;
+        paginationContainerSelector.querySelector(".total-pages").innerHTML = totalPages;
+
+        const prevBtnPagination = paginationContainerSelector.querySelector(".prev-btn")
+        const nextBtnPagination = paginationContainerSelector.querySelector(".next-btn")
+
+        if (currentPage === 1) {
+            prevBtnPagination.disabled = true
+            prevBtnPagination.classList.remove("cursor-pointer")
+            prevBtnPagination.classList.add("cursor-not-allowed", "opacity-50")
+        } else {
+            prevBtnPagination.disabled = false
+            prevBtnPagination.classList.remove("cursor-not-allowed", "opacity-50")
+            prevBtnPagination.classList.add("cursor-pointer")
+        }
+
+        if (currentPage === totalPages) {
+            nextBtnPagination.disabled = true
+            nextBtnPagination.classList.remove("cursor-pointer")
+            nextBtnPagination.classList.add("cursor-not-allowed", "opacity-50")
+        } else {
+            nextBtnPagination.disabled = false
+            nextBtnPagination.classList.remove("cursor-not-allowed", "opacity-50")
+            nextBtnPagination.classList.add("cursor-pointer")
+        }
+
+        container.innerHTML = "";
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const paginatedUsers = usersArray.slice(startIndex, startIndex + itemsPerPage);
+        if (paginatedUsers.length) {
+            paginatedUsers.forEach(user => {
+                container.insertAdjacentHTML("beforeend", `
+                    <a class="w-full p-2 bg-background-box border border-border-box rounded-md flex items-center" href="https://github.com/${user.userName}" target="_blank">
+                        <img class="w-9 h-9 rounded-full" src="${user.profile}" />
+                        <span class="text-sm ml-3 text-text-secondary">@${user.userName}</span>
+                    </a>
+                `);
+            });
+        } else {
+            container.insertAdjacentHTML("beforeend", `
+                <div class="flex flex-col items-center text-text-secondary py-25">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-10">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                    </svg>
+                    <h3 class="mt-2">No users found in this category.</h3>
+                </div>
+            `);
+        }
+
+    }
+
     // Fetches a user's followers & following (with or without token), handles rate limits, and returns both lists
     const fetchFollowersAndFollowing = async (tokenRateInfo, userName, token) => {
         let getUserProfileInfoRes = null
@@ -123,6 +181,8 @@ window.addEventListener("load", () => {
                     // Proceed with fetching followers and following lists
 
                     showToast({ container: toastContainer, message: "Finding users who don’t follow back or aren’t followed back. Please wait...", type: "search", duration: 6000 })
+                    showSkeletonLoaders({ container: notFollowingBackContainer })
+                    showSkeletonLoaders({ container: notFollowedBackContainer })
                     const following = await getFollowing({ userName, token })
                     const followers = await getFollowers({ userName, token })
 
@@ -143,6 +203,8 @@ window.addEventListener("load", () => {
                     // Proceed with fetching followers and following lists
 
                     showToast({ container: toastContainer, message: "Finding users who don’t follow back or aren’t followed back. Please wait...", type: "search", duration: 6000 })
+                    showSkeletonLoaders({ container: notFollowingBackContainer })
+                    showSkeletonLoaders({ container: notFollowedBackContainer })
                     const following = await getFollowing({ userName })
                     const followers = await getFollowers({ userName })
 
@@ -196,9 +258,9 @@ window.addEventListener("load", () => {
                 status: false,
                 text: "Please wait",
             });
-            changeInputStatus({ 
+            changeInputStatus({
                 input: searchUserInput,
-                status: false 
+                status: false
             });
 
             const token = getFromLocal("token")
@@ -224,6 +286,20 @@ window.addEventListener("load", () => {
 
                                 const usersNotFollowingMe = getUsersNotFollowingMe({ following, followers });
                                 const usersINotFollowingBack = getUsersINotFollowingBack({ following, followers });
+                                setupPaginationControls({
+                                    usersArray: usersNotFollowingMe,
+                                    container: notFollowingBackContainer,
+                                    currentPage: 1,
+                                    itemsPerPage: 9,
+                                    paginationContainerSelector: notFollowingBackPagination
+                                })
+                                setupPaginationControls({
+                                    usersArray: usersINotFollowingBack,
+                                    container: notFollowedBackContainer,
+                                    currentPage: 1,
+                                    itemsPerPage: 9,
+                                    paginationContainerSelector: notFollowedBackPagination
+                                })
                             }
                         } else {
                             // Token provided but rate limit still exceeded
@@ -251,6 +327,20 @@ window.addEventListener("load", () => {
 
                     const usersNotFollowingMe = getUsersNotFollowingMe({ following, followers });
                     const usersINotFollowingBack = getUsersINotFollowingBack({ following, followers });
+                    setupPaginationControls({
+                        usersArray: usersNotFollowingMe,
+                        container: notFollowingBackContainer,
+                        currentPage: 1,
+                        itemsPerPage: 9,
+                        paginationContainerSelector: notFollowingBackPagination
+                    })
+                    setupPaginationControls({
+                        usersArray: usersINotFollowingBack,
+                        container: notFollowedBackContainer,
+                        currentPage: 1,
+                        itemsPerPage: 9,
+                        paginationContainerSelector: notFollowedBackPagination
+                    })
                 }
             }
 
@@ -259,13 +349,20 @@ window.addEventListener("load", () => {
                 status: true,
                 text: originalText,
             });
-            changeInputStatus({ 
+            changeInputStatus({
                 input: searchUserInput,
-                status: true 
+                status: true
             });
         } else {
             showToast({ container: toastContainer, message: "Please enter a GitHub username to search.", type: "warning", duration: 5000 })
         }
     })
+
+    // Triggers search button click when Enter is pressed in the input field
+    searchUserInput.addEventListener("keyup", (event) => {
+        if (event.key === "Enter") {
+            searchUserBtn.click()
+        }
+    });
 
 })
