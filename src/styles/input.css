@@ -11,6 +11,7 @@
 @theme {
   --font-fira-code: "fira-code";
 
+  /* Dark Theme (default) */
   --color-background: #12161E; 
   --color-background-box: #181B25; 
   --color-overlay: #00000080; 
@@ -82,4 +83,53 @@
     }
   }
 
+}
+
+/* Light Theme */
+body.light-theme {
+  --color-background: #ffffff; 
+  --color-background-box: #f8f9fa; 
+  --color-overlay: #00000030;
+
+  --color-text-title: #1a1a1a;
+  --color-text-primary: #2d3748;
+  --color-text-secondary: #718096;
+
+  --color-error: #dc3545;
+  --color-success: #28a745; 
+  --color-warning: #ffc107;
+
+  --color-btn-primary: #4f46e5;
+  --color-btn-primary-hover: #4338ca;
+  --color-btn-secondary: #e2e8f0;
+  --color-btn-secondary-hover: #cbd5e0;
+
+  --color-border-input: #cbd5e0;
+  --color-border-menu: #e2e8f0;
+  --color-border-box: #e2e8f0;
+  --color-border-hr: #e2e8f0;
+}
+
+/* Smooth transitions */
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background-box);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-btn-secondary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-btn-secondary-hover);
 }

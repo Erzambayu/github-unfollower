@@ -128,6 +128,139 @@ const showSkeletonLoaders = ({ container }) => {
     }
 }
 
+// Theme Management
+const initTheme = () => {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-theme');
+    }
+    updateThemeIcons(savedTheme);
+}
+
+const toggleTheme = () => {
+    const body = document.body;
+    const currentTheme = body.classList.contains('light-theme') ? 'light' : 'dark';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    if (newTheme === 'light') {
+        body.classList.add('light-theme');
+    } else {
+        body.classList.remove('light-theme');
+    }
+    
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcons(newTheme);
+}
+
+const updateThemeIcons = (theme) => {
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+    
+    if (theme === 'light') {
+        sunIcon?.classList.remove('hidden');
+        moonIcon?.classList.add('hidden');
+    } else {
+        sunIcon?.classList.add('hidden');
+        moonIcon?.classList.remove('hidden');
+    }
+}
+
+// Search History Management
+const addToSearchHistory = (username) => {
+    let history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+    
+    // Remove if already exists
+    history = history.filter(item => item !== username);
+    
+    // Add to beginning
+    history.unshift(username);
+    
+    // Keep only last 5
+    if (history.length > 5) {
+        history = history.slice(0, 5);
+    }
+    
+    localStorage.setItem('searchHistory', JSON.stringify(history));
+    displaySearchHistory();
+}
+
+const displaySearchHistory = () => {
+    const history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+    const recentSearchesDiv = document.getElementById('recent-searches');
+    const container = document.getElementById('recent-searches-container');
+    
+    if (!container) return;
+    
+    if (history.length > 0) {
+        recentSearchesDiv?.classList.remove('hidden');
+        container.innerHTML = history.map(username => `
+            <button class="recent-search-item px-3 py-1 text-sm bg-background-box border border-border-box rounded-md text-text-secondary hover:text-text-primary hover:border-btn-primary transition-all duration-200" data-username="${username}">
+                ${username}
+            </button>
+        `).join('');
+    } else {
+        recentSearchesDiv?.classList.add('hidden');
+    }
+}
+
+const clearSearchHistory = () => {
+    localStorage.removeItem('searchHistory');
+    displaySearchHistory();
+}
+
+// Export Functionality
+const exportToCSV = (data, filename) => {
+    const csvContent = [
+        ['Username', 'Profile URL'],
+        ...data.map(user => [user.userName, `https://github.com/${user.userName}`])
+    ].map(row => row.join(',')).join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    downloadFile(blob, `${filename}.csv`);
+}
+
+const exportToJSON = (data, filename) => {
+    const jsonContent = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonContent], { type: 'application/json' });
+    downloadFile(blob, `${filename}.json`);
+}
+
+const downloadFile = (blob, filename) => {
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+// Statistics Calculation
+const updateStatistics = (followers, following) => {
+    const followersCount = followers.size;
+    const followingCount = following.size;
+    
+    // Calculate mutual follows
+    let mutualCount = 0;
+    followers.forEach((_, username) => {
+        if (following.has(username)) {
+            mutualCount++;
+        }
+    });
+    
+    const ratio = followingCount > 0 ? (followersCount / followingCount).toFixed(2) : '0';
+    
+    document.getElementById('stat-followers').textContent = followersCount.toLocaleString();
+    document.getElementById('stat-following').textContent = followingCount.toLocaleString();
+    document.getElementById('stat-mutual').textContent = mutualCount.toLocaleString();
+    document.getElementById('stat-ratio').textContent = ratio;
+    
+    document.getElementById('stats-dashboard')?.classList.remove('hidden');
+}
+
 export {
     showPopup,
     hidePopup,
@@ -139,4 +272,12 @@ export {
     changeBtnStatus,
     changeInputStatus,
     showSkeletonLoaders,
+    initTheme,
+    toggleTheme,
+    addToSearchHistory,
+    displaySearchHistory,
+    clearSearchHistory,
+    exportToCSV,
+    exportToJSON,
+    updateStatistics,
 }

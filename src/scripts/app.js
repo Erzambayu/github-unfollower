@@ -9,6 +9,14 @@ import {
     getUsersINotFollowingBack,
     changeInputStatus,
     showSkeletonLoaders,
+    initTheme,
+    toggleTheme,
+    addToSearchHistory,
+    displaySearchHistory,
+    clearSearchHistory,
+    exportToCSV,
+    exportToJSON,
+    updateStatistics,
 } from "../helpers/helper.js";
 import {
     getFollowingAndFollowers,
@@ -16,8 +24,17 @@ import {
     getUserProfileInfo,
 } from "../services/service.js";
 
+// Global variables to store current data for filtering and exporting
+let currentNotFollowingBack = [];
+let currentNotFollowedBack = [];
 
 window.addEventListener("load", () => {
+    // Initialize theme
+    initTheme();
+    
+    // Display search history
+    displaySearchHistory();
+
     // Show loading skeletons for notFollowedBack and notFollowingBack containers
     const notFollowingBackContainer = document.getElementById("not-followingBack-container")
     const notFollowedBackContainer = document.getElementById("not-followedBack-container")
@@ -43,6 +60,121 @@ window.addEventListener("load", () => {
     const searchUserBtn = document.getElementById("search-user-btn")
     const notFollowingBackPagination = document.getElementById("not-followingBack-pagination")
     const notFollowedBackPagination = document.getElementById("not-followedBack-pagination")
+    const themeToggleBtn = document.getElementById("theme-toggle")
+    const clearHistoryBtn = document.getElementById("clear-history-btn")
+    const exportNotFollowingBackBtn = document.getElementById("export-not-following-back")
+    const exportNotFollowedBackBtn = document.getElementById("export-not-followed-back")
+    const searchNotFollowingBack = document.getElementById("search-not-following-back")
+    const sortNotFollowingBack = document.getElementById("sort-not-following-back")
+    const searchNotFollowedBack = document.getElementById("search-not-followed-back")
+    const sortNotFollowedBack = document.getElementById("sort-not-followed-back")
+
+    // Theme toggle
+    themeToggleBtn?.addEventListener("click", toggleTheme);
+
+    // Clear history
+    clearHistoryBtn?.addEventListener("click", () => {
+        clearSearchHistory();
+        showToast({ container: toastContainer, message: "Search history cleared!", type: "success", duration: 3000 });
+    });
+
+    // Recent search click handler
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('recent-search-item')) {
+            const username = e.target.dataset.username;
+            searchUserInput.value = username;
+            searchUserBtn.click();
+        }
+    });
+
+    // Export handlers
+    exportNotFollowingBackBtn?.addEventListener("click", () => {
+        if (currentNotFollowingBack.length > 0) {
+            const username = searchUserInput.value.trim();
+            exportToCSV(currentNotFollowingBack, `${username}_not_following_back`);
+            showToast({ container: toastContainer, message: "List exported successfully!", type: "success", duration: 3000 });
+        } else {
+            showToast({ container: toastContainer, message: "No data to export", type: "warning", duration: 3000 });
+        }
+    });
+
+    exportNotFollowedBackBtn?.addEventListener("click", () => {
+        if (currentNotFollowedBack.length > 0) {
+            const username = searchUserInput.value.trim();
+            exportToCSV(currentNotFollowedBack, `${username}_not_followed_back`);
+            showToast({ container: toastContainer, message: "List exported successfully!", type: "success", duration: 3000 });
+        } else {
+            showToast({ container: toastContainer, message: "No data to export", type: "warning", duration: 3000 });
+        }
+    });
+
+    // Search and sort handlers for not following back
+    searchNotFollowingBack?.addEventListener("input", (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const filtered = currentNotFollowingBack.filter(user => 
+            user.userName.toLowerCase().includes(searchTerm)
+        );
+        setupPaginationControls({
+            usersArray: filtered,
+            container: notFollowingBackContainer,
+            currentPage: 1,
+            itemsPerPage: 9,
+            paginationContainerSelector: notFollowingBackPagination
+        });
+    });
+
+    sortNotFollowingBack?.addEventListener("change", (e) => {
+        const sortValue = e.target.value;
+        let sorted = [...currentNotFollowingBack];
+        
+        if (sortValue === "a-z") {
+            sorted.sort((a, b) => a.userName.localeCompare(b.userName));
+        } else if (sortValue === "z-a") {
+            sorted.sort((a, b) => b.userName.localeCompare(a.userName));
+        }
+        
+        setupPaginationControls({
+            usersArray: sorted,
+            container: notFollowingBackContainer,
+            currentPage: 1,
+            itemsPerPage: 9,
+            paginationContainerSelector: notFollowingBackPagination
+        });
+    });
+
+    // Search and sort handlers for not followed back
+    searchNotFollowedBack?.addEventListener("input", (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const filtered = currentNotFollowedBack.filter(user => 
+            user.userName.toLowerCase().includes(searchTerm)
+        );
+        setupPaginationControls({
+            usersArray: filtered,
+            container: notFollowedBackContainer,
+            currentPage: 1,
+            itemsPerPage: 9,
+            paginationContainerSelector: notFollowedBackPagination
+        });
+    });
+
+    sortNotFollowedBack?.addEventListener("change", (e) => {
+        const sortValue = e.target.value;
+        let sorted = [...currentNotFollowedBack];
+        
+        if (sortValue === "a-z") {
+            sorted.sort((a, b) => a.userName.localeCompare(b.userName));
+        } else if (sortValue === "z-a") {
+            sorted.sort((a, b) => b.userName.localeCompare(a.userName));
+        }
+        
+        setupPaginationControls({
+            usersArray: sorted,
+            container: notFollowedBackContainer,
+            currentPage: 1,
+            itemsPerPage: 9,
+            paginationContainerSelector: notFollowedBackPagination
+        });
+    });
 
 
 
@@ -142,8 +274,8 @@ window.addEventListener("load", () => {
         if (paginatedUsers.length) {
             paginatedUsers.forEach(user => {
                 container.insertAdjacentHTML("beforeend", `
-                    <a class="w-full p-2 bg-background-box border border-border-box rounded-md flex items-center" href="https://github.com/${user.userName}" target="_blank">
-                        <img class="w-9 h-9 rounded-full" src="${user.profile}" />
+                    <a class="w-full p-2 bg-background-box border border-border-box rounded-md flex items-center transition-all duration-200 hover:border-btn-primary hover:shadow-md transform hover:-translate-y-0.5" href="https://github.com/${user.userName}" target="_blank">
+                        <img class="w-9 h-9 rounded-full" src="${user.profile}" alt="${user.userName}" loading="lazy" />
                         <span class="text-sm ml-3 text-text-secondary">@${user.userName}</span>
                     </a>
                 `);
@@ -285,6 +417,17 @@ window.addEventListener("load", () => {
 
                                 const usersNotFollowingMe = getUsersNotFollowingMe({ following, followers });
                                 const usersINotFollowingBack = getUsersINotFollowingBack({ following, followers });
+                                
+                                // Store in global variables for filtering and exporting
+                                currentNotFollowingBack = usersNotFollowingMe;
+                                currentNotFollowedBack = usersINotFollowingBack;
+                                
+                                // Update statistics
+                                updateStatistics(followers, following);
+                                
+                                // Add to search history
+                                addToSearchHistory(userName);
+                                
                                 setupPaginationControls({
                                     usersArray: usersNotFollowingMe,
                                     container: notFollowingBackContainer,
@@ -326,6 +469,17 @@ window.addEventListener("load", () => {
 
                     const usersNotFollowingMe = getUsersNotFollowingMe({ following, followers });
                     const usersINotFollowingBack = getUsersINotFollowingBack({ following, followers });
+                    
+                    // Store in global variables for filtering and exporting
+                    currentNotFollowingBack = usersNotFollowingMe;
+                    currentNotFollowedBack = usersINotFollowingBack;
+                    
+                    // Update statistics
+                    updateStatistics(followers, following);
+                    
+                    // Add to search history
+                    addToSearchHistory(userName);
+                    
                     setupPaginationControls({
                         usersArray: usersNotFollowingMe,
                         container: notFollowingBackContainer,
